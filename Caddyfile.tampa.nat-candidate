@@ -1,0 +1,173 @@
+{
+	email admin@twidu.com
+	servers {
+		protocols h1 h2
+	}
+}
+
+https://levospeed.it.com:9444, https://www.levospeed.it.com:9444 {
+	bind 172.17.0.1
+	encode zstd gzip
+	header Alt-Svc "clear"
+
+	handle /machine* {
+		reverse_proxy 127.0.0.1:8088
+	}
+	handle /register* {
+		reverse_proxy 127.0.0.1:8088
+	}
+	handle /key* {
+		reverse_proxy 127.0.0.1:8088
+	}
+	handle /derp* {
+		reverse_proxy 127.0.0.1:8088
+	}
+	handle /.well-known* {
+		reverse_proxy 127.0.0.1:8088
+	}
+
+	handle /api/mobile/* {
+		reverse_proxy https://45.140.42.39 {
+			header_up Host sub.twidu.com
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
+			transport http {
+				tls
+				tls_server_name sub.twidu.com
+				read_timeout 2m
+				write_timeout 2m
+				dial_timeout 30s
+				keepalive 30s
+				versions 2 1.1
+			}
+		}
+	}
+	handle /api/sub/* {
+		reverse_proxy https://45.140.42.39 {
+			header_up Host sub.twidu.com
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
+			transport http {
+				tls
+				tls_server_name sub.twidu.com
+				read_timeout 2m
+				write_timeout 2m
+				dial_timeout 30s
+				keepalive 30s
+				versions 2 1.1
+			}
+		}
+	}
+	handle /sub/* {
+		reverse_proxy https://45.140.42.39 {
+			header_up Host sub.twidu.com
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
+			transport http {
+				tls
+				tls_server_name sub.twidu.com
+				read_timeout 2m
+				write_timeout 2m
+				dial_timeout 30s
+				keepalive 30s
+				versions 2 1.1
+			}
+		}
+	}
+	handle /api/status/* {
+		reverse_proxy https://45.140.42.39 {
+			header_up Host sub.twidu.com
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
+			transport http {
+				tls
+				tls_server_name sub.twidu.com
+				read_timeout 2m
+				write_timeout 2m
+				versions 2 1.1
+			}
+		}
+	}
+	handle /status/* {
+		reverse_proxy https://45.140.42.39 {
+			header_up Host sub.twidu.com
+			transport http {
+				tls
+				tls_server_name sub.twidu.com
+				read_timeout 2m
+				write_timeout 2m
+				versions 2 1.1
+			}
+		}
+	}
+	handle /f/* {
+		reverse_proxy https://45.140.42.39 {
+			header_up Host sub.twidu.com
+			transport http {
+				tls
+				tls_server_name sub.twidu.com
+				read_timeout 2m
+				write_timeout 2m
+				versions 2 1.1
+			}
+		}
+	}
+	handle /health {
+		reverse_proxy https://45.140.42.39 {
+			header_up Host sub.twidu.com
+			transport http {
+				tls
+				tls_server_name sub.twidu.com
+				read_timeout 30s
+				versions 2 1.1
+			}
+		}
+	}
+	respond 404
+}
+
+:80 {
+	respond /ping "US edge OK" 200
+}
+
+currency.shelby-fast.site {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy 127.0.0.1:19301
+	}
+
+	handle {
+		root * /opt/currency-project/client/dist
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}
+
+https://currency.shelby-fast.site:9444 {
+	bind 172.17.0.1
+	encode zstd gzip
+	header Alt-Svc "clear"
+
+	handle /api/* {
+		reverse_proxy 127.0.0.1:19301
+	}
+
+	handle {
+		root * /opt/currency-project/client/dist
+		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}

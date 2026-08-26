@@ -1,0 +1,17 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+COPY --chown=node:node package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY --chown=node:node --chmod=0555 dist ./dist
+
+ENV NODE_ENV=production
+ENV PORT=3001
+
+USER node
+
+EXPOSE 3001
+
+CMD ["node", "dist/server.js"]
